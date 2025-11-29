@@ -21,25 +21,28 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            background-color: #000;
+            background-color: transparent;
             overflow: hidden;
         }
         
         .scoreboard {
             display: flex;
-            width: 1200px;
-            height: 180px;
+            width: 900px;
+            height: 135px;
             position: relative;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
         }
         
         /* Left vertical bar with set scores */
         .set-scores-bar {
-            width: 70px;
+            width: 52px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: flex-end;
-            gap: 15px;
+            gap: 11px;
             padding: 0;
             position: relative;
             z-index: 10;
@@ -52,13 +55,13 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            width: 70px;
-            height: 70px;
+            width: 52px;
+            height: 52px;
             background-color: #ffffff;
         }
         
         .set-score-number {
-            font-size: 40px;
+            font-size: 30px;
             font-weight: bold;
             color: #000;
             z-index: 2;
@@ -71,7 +74,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            padding: 25px 40px;
+            padding: 19px 30px;
             width: auto;
             min-width: fit-content;
             z-index: 10;
@@ -80,9 +83,9 @@
         .main-panel::after {
             content: '';
             position: absolute;
-            right: -50px;
+            right: -37px;
             top: 0;
-            width: 50px;
+            width: 37px;
             height: 100%;
             background-color: rgb(18, 66, 28);
             clip-path: polygon(0 0, 100% 0, 0 100%);
@@ -98,7 +101,7 @@
         }
         
         .team-row:first-child {
-            padding-bottom: 25px;
+            padding-bottom: 19px;
             position: relative;
         }
         
@@ -107,13 +110,13 @@
             position: absolute;
             bottom: 1.5px;
             left: 0;
-            right: -20px;
+            right: -15px;
             height: 1.5px;
             background-color: rgba(255, 255, 255, 0.2);
         }
         
         .team-row:last-child {
-            padding-top: 25px;
+            padding-top: 19px;
         }
         
         .team-name-container {
@@ -130,12 +133,12 @@
         
         .team-name {
             color: #ffffff;
-            font-size: 32px;
+            font-size: 24px;
             font-weight: normal;
             font-style: normal;
             font-family: "DIN 1451", "DIN 1451 Std", "DIN 1451 Mittelschrift", "DIN Mittelschrift", "Arial Narrow", Arial, sans-serif;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.75px;
             line-height: 1.3;
         }
         
@@ -152,21 +155,21 @@
         .score-container {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-left: 30px;
+            gap: 9px;
+            margin-left: 22px;
         }
         
         .score-separator {
             width: 1px;
-            height: 50px;
+            height: 37px;
             background-color: rgba(255, 255, 255, 0.2);
         }
         
         .current-score {
-            font-size: 56px;
+            font-size: 42px;
             font-weight: bold;
             color: #ffffff;
-            min-width: 70px;
+            min-width: 52px;
             text-align: right;
             font-family: Arial, sans-serif;
         }
@@ -187,23 +190,23 @@
         
         /* Right diagonal panel */
         .diagonal-panel {
-            width: 200px;
+            width: 150px;
             background-color: rgb(34, 104, 71);
             position: relative;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 0 30px;
-            margin-left: -50px;
+            padding: 0 22px;
+            margin-left: -37px;
             z-index: 1;
         }
         
         .diagonal-panel::after {
             content: '';
             position: absolute;
-            right: -50px;
+            right: -37px;
             top: 0;
-            width: 50px;
+            width: 37px;
             height: 100%;
             background-color: rgb(34, 104, 71);
             clip-path: polygon(0 0, 100% 0, 0 100%);
@@ -219,8 +222,8 @@
         }
         
         .diagonal-score-row:first-child {
-            padding-bottom: 10px;
-            padding-top: 10px;
+            padding-bottom: 7px;
+            padding-top: 7px;
             position: relative;
         }
         
@@ -228,36 +231,36 @@
             content: '';
             position: absolute;
             bottom: 0;
-            left: 80px;
-            right: -30px;
+            left: 60px;
+            right: -22px;
             height: 1.5px;
             background-color: rgba(255, 255, 255, 0.2);
         }
         
         .diagonal-score-row:first-child .diagonal-score-container {
-            transform: translateX(35px);
+            transform: translateX(26px);
         }
         
         .diagonal-score-row:last-child {
-            padding-top: 10px;
-            padding-bottom: 10px;
+            padding-top: 7px;
+            padding-bottom: 7px;
         }
         
         .diagonal-score-row:last-child .diagonal-score-container {
-            transform: translateX(10px);
+            transform: translateX(7px);
         }
         
         .diagonal-score-container {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 9px;
         }
         
         .diagonal-score {
-            font-size: 56px;
+            font-size: 42px;
             font-weight: bold;
             color: #ffffff;
-            min-width: 70px;
+            min-width: 52px;
             text-align: right;
             font-family: Arial, sans-serif;
         }
@@ -325,7 +328,7 @@
 
     <script>
         function splitTeamName(name) {
-            if (name.length <= 22) {
+            if (name.length <= 16) {
                 return [name];
             }
             
@@ -340,7 +343,7 @@
             
             for (let i = 0; i < words.length; i++) {
                 const testLine = line1 ? line1 + ' ' + words[i] : words[i];
-                if (testLine.length <= 22) {
+                if (testLine.length <= 16) {
                     line1 = testLine;
                 } else {
                     // Put remaining words in line2
@@ -375,10 +378,10 @@
             temp.style.position = 'absolute';
             temp.style.visibility = 'hidden';
             temp.style.whiteSpace = 'nowrap';
-            temp.style.fontSize = '32px';
+            temp.style.fontSize = '24px';
             temp.style.fontWeight = '400';
             temp.style.textTransform = 'uppercase';
-            temp.style.letterSpacing = '0.5px';
+            temp.style.letterSpacing = '0.375px';
             temp.style.fontFamily = 'Arial, sans-serif';
             document.body.appendChild(temp);
             
@@ -412,9 +415,9 @@
             // Remove temporary element
             document.body.removeChild(temp);
             
-            // Set panel width (add padding: 40px left + 40px right = 80px)
+            // Set panel width (add padding: 30px left + 30px right = 60px)
             // Add a small buffer for better appearance
-            mainPanel.style.width = (maxWidth + 80) + 'px';
+            mainPanel.style.width = (maxWidth + 60) + 'px';
         }
         
         function updateMatchData() {

@@ -128,10 +128,10 @@ class SamsTicker:
                 await asyncio.sleep(5)
 
     async def main(self):
-        # Start Flask server in a separate thread
-        web_thread = Thread(target=self.run_web_server, daemon=True)
-        web_thread.start()
-        print("Web-Server läuft auf http://localhost:5050")
+        # Start Flask server in a separate thread for debug purposes
+        # web_thread = Thread(target=self.run_web_server, daemon=True)
+        # web_thread.start()
+        # print("Web-Server läuft auf http://localhost:5050")
 
         self.open_sams_ticker()
         self.get_matches()
@@ -145,11 +145,33 @@ class SamsTicker:
         while True:
             await self.connect_to_websocket()
 
+    def start_background_tasks(self):
+        """Startet die Websocket-Verbindung im Hintergrund"""
+        def run_async():
+            asyncio.run(self.main())
+        
+        thread = Thread(target=run_async, daemon=True)
+        thread.start()
+        print("Websocket-Verbindung im Hintergrund gestartet")
+
+
+# Globale Instanz für Gunicorn
+ticker_instance = SamsTicker()
+app = ticker_instance.app
+
+# Starte Websocket-Verbindung im Hintergrund (für Production mit Gunicorn)
+# Nur starten wenn nicht im __main__ Modus (dort wird es separat gestartet)
+if __name__ != '__main__':
+    ticker_instance.start_background_tasks()
+
 
 if __name__ == '__main__':
-    ticker_instance = SamsTicker()
+    # Lokaler Test-Modus mit Flask's Entwicklungsserver
+    ticker_instance.start_background_tasks()
     try:
-        asyncio.run(ticker_instance.main())
+        ticker_instance.app.run(host='0.0.0.0', port=5001, debug=False, use_reloader=False)
     except KeyboardInterrupt:
         print("\nShutting down...")
-        ticker_instance.running = False
+
+
+
