@@ -54,19 +54,19 @@ class SamsTicker:
         return response
 
     def get_matches(self):
-        response = self.session.get('https://backend.sams-ticker.de/live/indoor/tickers/vvb')
-        json_data = response.json()
+        try:
+            response = self.session.get('https://backend.sams-ticker.de/live/indoor/tickers/vvb')
+            json_data = response.json()
 
-        for day in json_data['matchDays']:
-            for match in day['matches']:
-                if self.team_id in match.get('team1', {}) or self.team_id in match.get('team2', {}) and match.get(
-                        'date', 0) > (time.time() - 3 * 60 * 60) * 1000:  # todo
-                    self.matches[match['id']] = match
+            for day in json_data['matchDays']:
+                for match in day['matches']:
+                    if self.team_id in match.get('team1', {}) or self.team_id in match.get('team2', {}) and match.get(
+                            'date', 0) > (time.time() - 3 * 60 * 60) * 1000:  # todo
+                        self.matches[match['id']] = match
+        except Exception as e:
+            print(f"Fehler beim Abrufen der Matches: {e}")
 
     def init_match(self):
-        if not self.matches:
-            return
-
         current_time = time.time() * 1000
         closest_match = min(
             self.matches.values(),
@@ -141,6 +141,7 @@ class SamsTicker:
         while not self.matches:
             print("Keine Matches gefunden. Warte 1 Minute...")
             await asyncio.sleep(60)
+            self.get_matches()
 
         self.init_match()
         print("Aktives Match:", self.active_match)
@@ -149,7 +150,6 @@ class SamsTicker:
             await self.connect_to_websocket()
 
     def start_background_tasks(self):
-        """Startet die Websocket-Verbindung im Hintergrund"""
         def run_async():
             asyncio.run(self.main())
         
@@ -180,25 +180,12 @@ else:
     def get_match():
         return jsonify({"error": "App nicht initialisiert"}), 500
 
-# Starte Websocket-Verbindung im Hintergrund (für Production mit Gunicorn)
-# Nur starten wenn nicht im __main__ Modus (dort wird es separat gestartet)
-if __name__ != '__main__' and ticker_instance:
-    try:
-        ticker_instance.start_background_tasks()
-    except Exception as e:
-        print(f"Fehler beim Starten der Hintergrund-Tasks: {e}")
-        import traceback
-        traceback.print_exc()
-
-
-if __name__ == '__main__':
-    # Lokaler Test-Modus mit Flask's Entwicklungsserver
-    if ticker_instance:
-        ticker_instance.start_background_tasks()
-    try:
-        app.run(host='0.0.0.0', port=10000, debug=False, use_reloader=False)
-    except KeyboardInterrupt:
-        print("\nShutting down...")
+if ticker_instance:
+    ticker_instance.start_background_tasks()
+try:
+    app.run(host='0.0.0.0', port=10000, debug=False, use_reloader=False)
+except KeyboardInterrupt:
+    print("\nShutting down...")
 
 
 
