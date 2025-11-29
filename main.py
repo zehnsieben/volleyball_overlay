@@ -155,21 +155,45 @@ class SamsTicker:
         print("Websocket-Verbindung im Hintergrund gestartet")
 
 
-# Globale Instanz für Gunicorn
-ticker_instance = SamsTicker()
-app = ticker_instance.app
+# Erstelle globale Instanz für Gunicorn
+ticker_instance = None
+try:
+    ticker_instance = SamsTicker()
+except Exception as e:
+    print(f"Fehler beim Initialisieren der App: {e}")
+    import traceback
+    traceback.print_exc()
+
+# Stelle sicher, dass app immer definiert ist
+if ticker_instance:
+    app = ticker_instance.app
+else:
+    # Fallback: Erstelle eine minimale Flask-App
+    app = Flask(__name__)
+    @app.route('/')
+    def index():
+        return "Fehler beim Initialisieren der App", 500
+    @app.route('/api/match')
+    def get_match():
+        return jsonify({"error": "App nicht initialisiert"}), 500
 
 # Starte Websocket-Verbindung im Hintergrund (für Production mit Gunicorn)
 # Nur starten wenn nicht im __main__ Modus (dort wird es separat gestartet)
-if __name__ != '__main__':
-    ticker_instance.start_background_tasks()
+if __name__ != '__main__' and ticker_instance:
+    try:
+        ticker_instance.start_background_tasks()
+    except Exception as e:
+        print(f"Fehler beim Starten der Hintergrund-Tasks: {e}")
+        import traceback
+        traceback.print_exc()
 
 
 if __name__ == '__main__':
     # Lokaler Test-Modus mit Flask's Entwicklungsserver
-    ticker_instance.start_background_tasks()
+    if ticker_instance:
+        ticker_instance.start_background_tasks()
     try:
-        ticker_instance.app.run(host='0.0.0.0', port=5001, debug=False, use_reloader=False)
+        app.run(host='0.0.0.0', port=5001, debug=False, use_reloader=False)
     except KeyboardInterrupt:
         print("\nShutting down...")
 
