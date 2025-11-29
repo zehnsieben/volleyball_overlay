@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volleyball Overlay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #000;
+            overflow: hidden;
+        }
+        
+        .scoreboard {
+            display: flex;
+            width: 1200px;
+            height: 180px;
+            position: relative;
+        }
+        
+        /* Left vertical bar with set scores */
+        .set-scores-bar {
+            width: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 15px;
+            padding: 0;
+            position: relative;
+            z-index: 10;
+            margin-right: 0;
+            align-self: center;
+        }
+        
+        .set-score-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            width: 70px;
+            height: 70px;
+            background-color: #ffffff;
+        }
+        
+        .set-score-number {
+            font-size: 40px;
+            font-weight: bold;
+            color: #000;
+            z-index: 2;
+        }
+        
+        
+        /* Main dark blue panel */
+        .main-panel {
+            background-color: rgb(18, 66, 28);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding: 25px 40px;
+            width: auto;
+            min-width: fit-content;
+            z-index: 10;
+        }
+        
+        .main-panel::after {
+            content: '';
+            position: absolute;
+            right: -50px;
+            top: 0;
+            width: 50px;
+            height: 100%;
+            background-color: rgb(18, 66, 28);
+            clip-path: polygon(0 0, 100% 0, 0 100%);
+            z-index: 1;
+        }
+        
+        .team-row {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+        
+        .team-row:first-child {
+            padding-bottom: 25px;
+            position: relative;
+        }
+        
+        .team-row:first-child::after {
+            content: '';
+            position: absolute;
+            bottom: 1.5px;
+            left: 0;
+            right: -20px;
+            height: 1.5px;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .team-row:last-child {
+            padding-top: 25px;
+        }
+        
+        .team-name-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        @font-face {
+            font-family: 'DIN 1451';
+            src: local('DIN 1451 Std'), local('DIN 1451'), local('DIN Mittelschrift');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        .team-name {
+            color: #ffffff;
+            font-size: 32px;
+            font-weight: normal;
+            font-style: normal;
+            font-family: "DIN 1451", "DIN 1451 Std", "DIN 1451 Mittelschrift", "DIN Mittelschrift", "Arial Narrow", Arial, sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1.3;
+        }
+        
+        .team-name.multiline {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .team-name.multiline span {
+            display: block;
+        }
+        
+        .score-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: 30px;
+        }
+        
+        .score-separator {
+            width: 1px;
+            height: 50px;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .current-score {
+            font-size: 56px;
+            font-weight: bold;
+            color: #ffffff;
+            min-width: 70px;
+            text-align: right;
+            font-family: Arial, sans-serif;
+        }
+        
+        .serving-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            opacity: 0;
+            transition: opacity 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .serving-dot.active {
+            opacity: 1;
+        }
+        
+        /* Right diagonal panel */
+        .diagonal-panel {
+            width: 200px;
+            background-color: rgb(34, 104, 71);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 30px;
+            margin-left: -50px;
+            z-index: 1;
+        }
+        
+        .diagonal-panel::after {
+            content: '';
+            position: absolute;
+            right: -50px;
+            top: 0;
+            width: 50px;
+            height: 100%;
+            background-color: rgb(34, 104, 71);
+            clip-path: polygon(0 0, 100% 0, 0 100%);
+            z-index: -1;
+        }
+        
+        .diagonal-score-row {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            position: relative;
+        }
+        
+        .diagonal-score-row:first-child {
+            padding-bottom: 10px;
+            padding-top: 10px;
+            position: relative;
+        }
+        
+        .diagonal-score-row:first-child::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 80px;
+            right: -30px;
+            height: 1.5px;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .diagonal-score-row:first-child .diagonal-score-container {
+            transform: translateX(35px);
+        }
+        
+        .diagonal-score-row:last-child {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+        
+        .diagonal-score-row:last-child .diagonal-score-container {
+            transform: translateX(10px);
+        }
+        
+        .diagonal-score-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .diagonal-score {
+            font-size: 56px;
+            font-weight: bold;
+            color: #ffffff;
+            min-width: 70px;
+            text-align: right;
+            font-family: Arial, sans-serif;
+        }
+        
+        .diagonal-serving-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            opacity: 0;
+            transition: opacity 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .diagonal-serving-dot.active {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="scoreboard">
+        <!-- Left set scores bar -->
+        <div class="set-scores-bar">
+            <div class="set-score-item">
+                <span class="set-score-number" id="set1">0</span>
+            </div>
+            <div class="set-score-item">
+                <span class="set-score-number" id="set2">0</span>
+            </div>
+        </div>
+        
+        <!-- Main panel -->
+        <div class="main-panel">
+            <!-- Team 1 row -->
+            <div class="team-row">
+                <div class="team-name-container">
+                    <div class="team-name" id="team1">Team 1</div>
+                </div>
+            </div>
+            
+            <!-- Team 2 row -->
+            <div class="team-row">
+                <div class="team-name-container">
+                    <div class="team-name" id="team2">Team 2</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right diagonal panel -->
+        <div class="diagonal-panel">
+            <div class="diagonal-score-row">
+                <div class="diagonal-score-container">
+                    <div class="diagonal-score" id="score1">0</div>
+                    <div class="diagonal-serving-dot" id="serving1"></div>
+                </div>
+            </div>
+            <div class="diagonal-score-row">
+                <div class="diagonal-score-container">
+                    <div class="diagonal-score" id="score2">0</div>
+                    <div class="diagonal-serving-dot" id="serving2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function splitTeamName(name) {
+            if (name.length <= 22) {
+                return [name];
+            }
+            
+            const words = name.split(' ');
+            if (words.length === 1) {
+                // Single word longer than 22 chars, split it
+                return [name];
+            }
+            
+            let line1 = '';
+            let line2 = '';
+            
+            for (let i = 0; i < words.length; i++) {
+                const testLine = line1 ? line1 + ' ' + words[i] : words[i];
+                if (testLine.length <= 22) {
+                    line1 = testLine;
+                } else {
+                    // Put remaining words in line2
+                    line2 = words.slice(i).join(' ');
+                    break;
+                }
+            }
+            
+            return line2 ? [line1, line2] : [line1];
+        }
+        
+        function updateTeamName(elementId, name) {
+            const element = document.getElementById(elementId);
+            const lines = splitTeamName(name);
+            
+            if (lines.length > 1) {
+                element.className = 'team-name multiline';
+                element.innerHTML = lines.map(line => `<span>${line}</span>`).join('');
+            } else {
+                element.className = 'team-name';
+                element.textContent = name;
+            }
+        }
+        
+        function updatePanelWidth() {
+            const team1 = document.getElementById('team1');
+            const team2 = document.getElementById('team2');
+            const mainPanel = document.querySelector('.main-panel');
+            
+            // Create a temporary element to measure text width
+            const temp = document.createElement('div');
+            temp.style.position = 'absolute';
+            temp.style.visibility = 'hidden';
+            temp.style.whiteSpace = 'nowrap';
+            temp.style.fontSize = '32px';
+            temp.style.fontWeight = '400';
+            temp.style.textTransform = 'uppercase';
+            temp.style.letterSpacing = '0.5px';
+            temp.style.fontFamily = 'Arial, sans-serif';
+            document.body.appendChild(temp);
+            
+            // Measure both team names
+            let maxWidth = 0;
+            
+            // Measure team1 - get the widest line if multiline
+            if (team1.classList.contains('multiline')) {
+                const spans = team1.querySelectorAll('span');
+                spans.forEach(span => {
+                    temp.textContent = span.textContent;
+                    maxWidth = Math.max(maxWidth, temp.offsetWidth);
+                });
+            } else {
+                temp.textContent = team1.textContent;
+                maxWidth = Math.max(maxWidth, temp.offsetWidth);
+            }
+            
+            // Measure team2 - get the widest line if multiline
+            if (team2.classList.contains('multiline')) {
+                const spans = team2.querySelectorAll('span');
+                spans.forEach(span => {
+                    temp.textContent = span.textContent;
+                    maxWidth = Math.max(maxWidth, temp.offsetWidth);
+                });
+            } else {
+                temp.textContent = team2.textContent;
+                maxWidth = Math.max(maxWidth, temp.offsetWidth);
+            }
+            
+            // Remove temporary element
+            document.body.removeChild(temp);
+            
+            // Set panel width (add padding: 40px left + 40px right = 80px)
+            // Add a small buffer for better appearance
+            mainPanel.style.width = (maxWidth + 80) + 'px';
+        }
+        
+        function updateMatchData() {
+            fetch('/api/match')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('HTTP error! status: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Daten empfangen:', data);
+                    
+                    // Update set scores
+                    document.getElementById('set1').textContent = data.set1 || 0;
+                    document.getElementById('set2').textContent = data.set2 || 0;
+                    
+                    // Update team names with word wrapping
+                    updateTeamName('team1', data.team1 || 'Team 1');
+                    updateTeamName('team2', data.team2 || 'Team 2');
+                    
+                    // Update panel width based on longest team name
+                    setTimeout(updatePanelWidth, 0);
+                    
+                    // Update current scores
+                    document.getElementById('score1').textContent = data.score1 || 0;
+                    document.getElementById('score2').textContent = data.score2 || 0;
+                    
+                    // Update serving indicator
+                    const serving = data.serving || 0;
+                    document.getElementById('serving1').classList.toggle('active', serving === 0);
+                    document.getElementById('serving2').classList.toggle('active', serving === 1);
+                })
+                .catch(error => {
+                    console.error('Fehler beim Laden der Daten:', error);
+                });
+        }
+
+        // Sofort beim Laden aktualisieren
+        updateMatchData();
+        
+        // Initial panel width update after a short delay to ensure DOM is ready
+        setTimeout(updatePanelWidth, 100);
+
+        // Dann jede Sekunde aktualisieren
+        setInterval(updateMatchData, 1000);
+    </script>
+</body>
+</html>
+
