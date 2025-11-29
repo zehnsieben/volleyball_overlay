@@ -133,14 +133,17 @@ class SamsTicker:
         # web_thread.start()
         # print("Web-Server läuft auf http://localhost:5050")
 
+        print("Starte Sams Ticker Client...")
         self.open_sams_ticker()
         self.get_matches()
+        print("Gefundene Matches:", self.matches)
 
         while not self.matches:
             print("Keine Matches gefunden. Warte 1 Minute...")
             await asyncio.sleep(60)
 
         self.init_match()
+        print("Aktives Match:", self.active_match)
 
         while True:
             await self.connect_to_websocket()
