@@ -137,16 +137,7 @@
             text-transform: uppercase;
             letter-spacing: 0.75px;
             line-height: 1.3;
-        }
-        
-        .team-name.multiline {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        
-        .team-name.multiline span {
-            display: block;
+            white-space: nowrap;
         }
         
         .score-container {
@@ -324,45 +315,9 @@
     </div>
 
     <script>
-        function splitTeamName(name) {
-            if (name.length <= 16) {
-                return [name];
-            }
-            
-            const words = name.split(' ');
-            if (words.length === 1) {
-                // Single word longer than 22 chars, split it
-                return [name];
-            }
-            
-            let line1 = '';
-            let line2 = '';
-            
-            for (let i = 0; i < words.length; i++) {
-                const testLine = line1 ? line1 + ' ' + words[i] : words[i];
-                if (testLine.length <= 16) {
-                    line1 = testLine;
-                } else {
-                    // Put remaining words in line2
-                    line2 = words.slice(i).join(' ');
-                    break;
-                }
-            }
-            
-            return line2 ? [line1, line2] : [line1];
-        }
-        
         function updateTeamName(elementId, name) {
             const element = document.getElementById(elementId);
-            const lines = splitTeamName(name);
-            
-            if (lines.length > 1) {
-                element.className = 'team-name multiline';
-                element.innerHTML = lines.map(line => `<span>${line}</span>`).join('');
-            } else {
-                element.className = 'team-name';
-                element.textContent = name;
-            }
+            element.textContent = name;
         }
         
         function updatePanelWidth() {
@@ -378,42 +333,21 @@
             temp.style.fontSize = '24px';
             temp.style.fontWeight = '400';
             temp.style.textTransform = 'uppercase';
-            temp.style.letterSpacing = '0.375px';
-            temp.style.fontFamily = 'Arial, sans-serif';
+            temp.style.letterSpacing = '0.75px';
+            temp.style.fontFamily = '"DIN 1451", "DIN 1451 Std", "DIN 1451 Mittelschrift", "DIN Mittelschrift", "Arial Narrow", Arial, sans-serif';
             document.body.appendChild(temp);
             
             // Measure both team names
-            let maxWidth = 0;
+            temp.textContent = team1.textContent;
+            let maxWidth = temp.offsetWidth;
             
-            // Measure team1 - get the widest line if multiline
-            if (team1.classList.contains('multiline')) {
-                const spans = team1.querySelectorAll('span');
-                spans.forEach(span => {
-                    temp.textContent = span.textContent;
-                    maxWidth = Math.max(maxWidth, temp.offsetWidth);
-                });
-            } else {
-                temp.textContent = team1.textContent;
-                maxWidth = Math.max(maxWidth, temp.offsetWidth);
-            }
-            
-            // Measure team2 - get the widest line if multiline
-            if (team2.classList.contains('multiline')) {
-                const spans = team2.querySelectorAll('span');
-                spans.forEach(span => {
-                    temp.textContent = span.textContent;
-                    maxWidth = Math.max(maxWidth, temp.offsetWidth);
-                });
-            } else {
-                temp.textContent = team2.textContent;
-                maxWidth = Math.max(maxWidth, temp.offsetWidth);
-            }
+            temp.textContent = team2.textContent;
+            maxWidth = Math.max(maxWidth, temp.offsetWidth);
             
             // Remove temporary element
             document.body.removeChild(temp);
             
             // Set panel width (add padding: 30px left + 30px right = 60px)
-            // Add a small buffer for better appearance
             mainPanel.style.width = (maxWidth + 60) + 'px';
         }
         
@@ -432,7 +366,7 @@
                     document.getElementById('set1').textContent = data.set1 || 0;
                     document.getElementById('set2').textContent = data.set2 || 0;
                     
-                    // Update team names with word wrapping
+                    // Update team names
                     updateTeamName('team1', data.team1 || 'Team 1');
                     updateTeamName('team2', data.team2 || 'Team 2');
                     
@@ -464,4 +398,3 @@
     </script>
 </body>
 </html>
-
