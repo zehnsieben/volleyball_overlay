@@ -13,7 +13,7 @@ from flask import Flask, render_template, jsonify
 
 class SamsTicker:
     def __init__(self):
-        self.team_id = "3b1fa79e-1276-4496-9e55-5366d60df69a"
+        self.team_ids = ["3b1fa79e-1276-4496-9e55-5366d60df69a", "a4e7fe9f-0737-49db-ba6b-d816860c0c39"]
 
         self.session = requests.Session()
         self.session.headers.update({
@@ -60,8 +60,10 @@ class SamsTicker:
 
             for day in json_data['matchDays']:
                 for match in day['matches']:
-                    if self.team_id in match.get('team1', {}) or self.team_id in match.get('team2', {}) and match.get(
-                            'date', 0) > (time.time() - 3 * 60 * 60) * 1000:  # todo
+                    if (
+                            any(id_ in match.get(team, {}) for id_ in self.team_ids for team in ('team1', 'team2'))
+                            and match.get('date', 0) > (time.time() - 3 * 60 * 60) * 1000
+                    ):
                         self.matches[match['id']] = match
         except Exception as e:
             print(f"Fehler beim Abrufen der Matches: {e}")
@@ -109,7 +111,8 @@ class SamsTicker:
                                     self.active_match['set2'] = payload['setPoints'].get('team2', 0)
                                     self.active_match['score1'] = payload['matchSets'][-1]['setScore'].get('team1', 0)
                                     self.active_match['score2'] = payload['matchSets'][-1]['setScore'].get('team2', 0)
-                                    self.active_match['serving'] = 0 if payload.get('serving', 'team1') == 'team1' else 1
+                                    self.active_match['serving'] = 0 if payload.get('serving',
+                                                                                    'team1') == 'team1' else 1
 
                                     if payload.get('finalized', False):
                                         self.matches.pop(match_uuid)
@@ -152,7 +155,7 @@ class SamsTicker:
     def start_background_tasks(self):
         def run_async():
             asyncio.run(self.main())
-        
+
         thread = Thread(target=run_async, daemon=True)
         thread.start()
         print("Websocket-Verbindung im Hintergrund gestartet")
@@ -165,6 +168,7 @@ try:
 except Exception as e:
     print(f"Fehler beim Initialisieren der App: {e}")
     import traceback
+
     traceback.print_exc()
 
 # Stelle sicher, dass app immer definiert ist
@@ -173,9 +177,13 @@ if ticker_instance:
 else:
     # Fallback: Erstelle eine minimale Flask-App
     app = Flask(__name__)
+
+
     @app.route('/')
     def index():
         return "Fehler beim Initialisieren der App", 500
+
+
     @app.route('/api/match')
     def get_match():
         return jsonify({"error": "App nicht initialisiert"}), 500
@@ -186,6 +194,3 @@ try:
     app.run(host='0.0.0.0', port=10000, debug=False, use_reloader=False)
 except KeyboardInterrupt:
     print("\nShutting down...")
-
-
-
