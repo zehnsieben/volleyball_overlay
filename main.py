@@ -13,7 +13,7 @@ from flask import Flask, render_template, jsonify
 
 class SamsTicker:
     def __init__(self):
-        self.team_ids = ["3b1fa79e-1276-4496-9e55-5366d60df69a", "a4e7fe9f-0737-49db-ba6b-d816860c0c39"]
+        self.team_ids = ["4522cdd8-3c47-4248-8854-3335c7246549"]
 
         self.session = requests.Session()
         self.session.headers.update({
