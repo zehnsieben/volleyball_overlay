@@ -1,0 +1,31 @@
+[Unit]
+Description=Volleyball live overlay
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=volleyball
+Group=volleyball
+WorkingDirectory=/opt/volleyball-overlay
+ExecStart=/opt/volleyball-overlay/.venv/bin/python main.py serve --schedule /var/lib/volleyball-overlay/schedule.json --state /var/lib/volleyball-overlay/runtime.json
+Restart=on-failure
+RestartSec=15
+StateDirectory=volleyball-overlay
+StateDirectoryMode=0700
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONUNBUFFERED=1
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+.venv/
+.idea/
+__pycache__/
+*.pyc
+runtime.json
+schedule.json
+vvb.json
+tmp.json
+.DS_Store
+*.json.tmp
