@@ -30,6 +30,7 @@
             width: 900px;
             height: 135px;
             position: relative;
+            transform: scale(0.6);
         }
         
         /* Left vertical bar with set scores */
@@ -194,10 +195,10 @@
             position: absolute;
             right: -37px;
             top: 0;
-            width: 37px;
+            width: 39px;
             height: 100%;
             background-color: rgb(34, 104, 71);
-            clip-path: polygon(0 0, 100% 0, 0 100%);
+            clip-path: polygon(0 0, 100% 0, 2px 100%);
             z-index: -1;
         }
         
@@ -360,7 +361,6 @@
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Daten empfangen:', data);
                     
                     // Update set scores
                     document.getElementById('set1').textContent = data.set1 || 0;
@@ -378,7 +378,7 @@
                     document.getElementById('score2').textContent = data.score2 || 0;
                     
                     // Update serving indicator
-                    const serving = data.serving || 0;
+                    const serving = data.serving;
                     document.getElementById('serving1').classList.toggle('active', serving === 0);
                     document.getElementById('serving2').classList.toggle('active', serving === 1);
                 })
